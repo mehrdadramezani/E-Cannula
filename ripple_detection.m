@@ -15,9 +15,7 @@ load('lfp_data_example.mat');
 n_channels = length(lfp_data); % NEED TO CHECK NAMES (lfp_data)
 
 % bandpass filter the data at ripple range
-d_band = designfilt('bandpassiir','FilterOrder',4, ...
-        'HalfPowerFrequency1',120,'HalfPowerFrequency2',250, ...
-        'SampleRate',1e3);
+d_band = designfilt('bandpassiir','FilterOrder',4,'HalfPowerFrequency1',120,'HalfPowerFrequency2',250,'SampleRate',1e3);
 
 % compute the envelope of the ripple band ECoG
 ripple_data = filtfilt(d_band,data_low);
@@ -37,7 +35,7 @@ seg_cross(1:mask_out_len,:) = 0;
 seg_cross(end-mask_out_len:end,:) = 0;
 
 
-%% detect ripple events in each channel
+% detect ripple events in each channel
 ripple_result = struct;
 for channel = 1:n_channels
     % locate the cross threshold position
@@ -88,10 +86,8 @@ end
 ripple_result_combine = struct;
 ripple_result_combine.ripple_start = find(diff(combine_ripple)==1)'+1; % sample index at 1 kHz
 ripple_result_combine.ripple_end = find(diff(combine_ripple)==-1)';
-ripple_result_combine.ripple_dur = ripple_result_combine.ripple_end - ...
-    ripple_result_combine.ripple_start;
-ripple_result_combine.ripple_center = ceil(0.5*(ripple_result_combine.ripple_end + ...
-    ripple_result_combine.ripple_start));
+ripple_result_combine.ripple_dur = ripple_result_combine.ripple_end - ripple_result_combine.ripple_start;
+ripple_result_combine.ripple_center = ceil(0.5*(ripple_result_combine.ripple_end + ripple_result_combine.ripple_start));
 
 % Now start manual curation for the detected ripple events one-by-one...
 % now go through all the ripple events and label them...
