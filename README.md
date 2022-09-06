@@ -1,6 +1,7 @@
 # E-Cannula reveals anatomical diversity in sharp-wave ripples
 This repository hosts the codes for decoding spatiotemporal characteristics of SWRs from the activity of cell assemblies imaged in the CA1 region of mice. 
-![Graphical Abstract]()
+![Graphical_Abstract_Liu_etal](https://user-images.githubusercontent.com/54346811/188725459-f622877c-2031-4bae-8b94-410114db33d8.png)
+
 
 
 ## Usage Guide
