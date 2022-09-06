@@ -9,21 +9,21 @@
 % mat file.
 
 
-%% Load the data (LFP)
+% Load the data (LFP)
 load('lfp_data_example.mat');
 
 n_channels = length(lfp_data); % NEED TO CHECK NAMES (lfp_data)
 
-%% bandpass filter the data at ripple range
+% bandpass filter the data at ripple range
 d_band = designfilt('bandpassiir','FilterOrder',4, ...
         'HalfPowerFrequency1',120,'HalfPowerFrequency2',250, ...
         'SampleRate',1e3);
 
-%% compute the envelope of the ripple band ECoG
+% compute the envelope of the ripple band ECoG
 ripple_data = filtfilt(d_band,data_low);
 ripple_env = abs(hilbert(ripple_data));
 
-%% ripple detection parameters
+% ripple detection parameters
 thresh_dur = 20; % minimum duration is 20 ms
 mask_out_len = 100; % mask out first and last 100 ms data, where ripple filtering can have transient artifacts
 merge_criteria = 10; % merge adjacent ripple events within 10 ms
@@ -31,7 +31,7 @@ folds = 3.5; % multiple of SD for ripple detection
 thresh_base = mean(ripple_env); % mean activity
 thresh = folds*std(ripple_env,1) + thresh_base; % the threshold used to detect ripple
 
-%% detect all ripple candidates for all channels
+% detect all ripple candidates for all channels
 seg_cross = ripple_env > thresh;
 seg_cross(1:mask_out_len,:) = 0;
 seg_cross(end-mask_out_len:end,:) = 0;
@@ -93,7 +93,7 @@ ripple_result_combine.ripple_dur = ripple_result_combine.ripple_end - ...
 ripple_result_combine.ripple_center = ceil(0.5*(ripple_result_combine.ripple_end + ...
     ripple_result_combine.ripple_start));
 
-%% Now start manual curation for the detected ripple events one-by-one...
+% Now start manual curation for the detected ripple events one-by-one...
 % now go through all the ripple events and label them...
 % Instructions: 
 % - Use left and right keys to go between different ripple events
@@ -205,5 +205,5 @@ while(current >= 1 && current <= n_all)
 end
 
 
-%%  Save the ripple detection results
+%  Save the ripple detection results
 save(['refined_SWRs.mat'],'true_ripples','ripple_result_combine');
