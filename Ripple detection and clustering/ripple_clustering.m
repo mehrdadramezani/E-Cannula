@@ -7,11 +7,10 @@
 % This code clusters the detected ripples into four distinct groups with
 % different spatiotemporal profiles (Local, Global, Travelling, Stationary)
 % on example LFP data.
-% The result (???????) is saved to
-% mat file.
+% The clustered ripples are saved to mat file.
 
 
-%% Load the LFP data and detected SWRs
+%% Load the ripple envelope (Refer to ripple_detection.m) and detected SWRs
 load('ripple_env.mat');
 load('refined_SWRs.mat');
 
