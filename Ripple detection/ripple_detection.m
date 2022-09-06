@@ -5,21 +5,20 @@
 % (C) Mehrdad Ramezani, Kuzum Lab, University of California San Diego
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This code implements threshold based ripple detection algorithm on example LFP data.
-% The result (ripple time, ripple duration/amplitude/frequency) is saved to
-% mat file.
+% The result (true_ripples:indices of real ripples, ripple_result_combine:
+% struct data including indices, time, etc. of automatically detected
+% ripples) is saved to mat file.
 
 
 %% Load the data (LFP)
 load('lfp_data_example.mat');
 
-n_channels = length(lfp_data); % NEED TO CHECK NAMES (lfp_data)
-
 %% bandpass filter the data at ripple range
 d_band = designfilt('bandpassiir','FilterOrder',4, ...
         'HalfPowerFrequency1',120,'HalfPowerFrequency2',250, ...
-        'SampleRate',1e3);
+        'SampleRate',fs);
 
-ripple_data = filtfilt(d_band,data_low);
+ripple_data = filtfilt(d_band,lfp_data);
 
 %% compute the envelope of the ripple band ECoG
 ripple_env = abs(hilbert(ripple_data));
@@ -78,7 +77,7 @@ for channel = 1:n_channels
 end
 
 % Now obtain the ripple event across array by merging all channels
-combine_ripple = t_low.*0;
+combine_ripple = t.*0;
 for channel = 1:n_channels
     for i = 1:length(ripple_result(channel).ripple_start)
         start = ripple_result(channel).ripple_start(i);
@@ -101,6 +100,7 @@ ripple_result_combine.ripple_center = ceil(0.5*(ripple_result_combine.ripple_end
 % - Use up key to mark it true ripple
 % - Use down key to mark it as false ripple
 
+n_all = length(ripple_result_combine.ripple_dur);
 lfp_mappped(:,pos) = lfp_data;
 
 true_ripples = [];
@@ -149,33 +149,26 @@ while(current >= 1 && current <= n_all)
         plot(hax2,t_plot(interval(101:end-100))+xoffsets(c), -data_remap(c,interval(101:end-100))+yoffsets(c),'r');
     end
     
-    [~,ind] = min(abs(t_Ca - ripple_result_combine.ripple_start(current)/fs_low));
-    if move_ind(ind)
-        title(hax2,['Ripple ',num2str(current),'/',num2str(n_all),' move']);
-    else
-        title(hax2,['Ripple ',num2str(current),'/',num2str(n_all)]);
-    end
     xlim(hax2,[0.5,4.5]); ylim([0.5,4.5]);
     set(hax2,'XColor','None','YColor','None'); box off;
-    hold off;
+    hold off;    
     
     % plot the LFP around it
     ind_plot = ripple_result_combine.ripple_center(current);
     for i = 1:16
-        plot(hax1,t_low(ind_plot+(-100:100)), lfp_mappped(ind_plot+(-100:100),i)+i*500); hold on;
-        text(hax1,t_low(ind_plot+80), i*500+50, num2str(i),'fontsize',12);
+        plot(hax1,t(ind_plot+(-100:100)), lfp_data(ind_plot+(-100:100),i)+i*500); hold on;
+        text(hax1,t(ind_plot+80), i*500+50, num2str(i),'fontsize',12);
     end
-    plot(hax1,[1,1]*t_low(ind_plot),[500,8000],'r');
+    plot(hax1,[1,1]*t(ind_plot),[500,8000],'r');
     hold off;
-    xlim(hax1,[-0.1,0.1]+ind_plot/fs_low);
-    ylim(hax1,[0,9000]);
-    
+    %xlim(hax1,[-0.1,0.1]+ind_plot/fs);
+    %ylim(hax1,[0,9000]);
     
     
     % Plot the LFP around it (mapped)
-    t_plot = t_low(ind_plot+(-100:100)) - t_low(ind_plot);
+    t_plot = t(ind_plot+(-100:100)) - t(ind_plot);
     for i = 1:16
-        plot(hax3,t_plot+xoffsets(i)/3,-lfp_mappped(ind_plot+(-100:100),i)/4000+yoffsets(i)/3,'color',[0, 0.4470, 0.7410]); hold on;
+        plot(hax3,t_plot+xoffsets(i)/3,-lfp_data(ind_plot+(-100:100),i)/4000+yoffsets(i)/3,'color',[0, 0.4470, 0.7410]); hold on;
         text(hax3,t_plot(1)+xoffsets(i)/3-0.05, yoffsets(i)/3, num2str(i),'fontsize',12);
         plot(hax3,xoffsets(i)/3+[0,0], [-0.1,0.1]+yoffsets(i)/3, '--r');
     end
@@ -183,6 +176,7 @@ while(current >= 1 && current <= n_all)
     xlim(hax3,[0.1,1.5]); ylim(hax3, [0.1,1.5]);
     set(hax3,'XColor','None','YColor','None'); box off;
     set(hax3,'YDir','reverse');
+    
     
     k = waitforbuttonpress; 
     value = double(get(fig2,'CurrentCharacter'));
