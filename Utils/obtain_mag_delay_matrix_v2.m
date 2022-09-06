@@ -1,7 +1,6 @@
 function [mag_true,dt_true] = obtain_mag_delay_matrix_v2(env_true,pos,mag_type)
 interval_mask = 21:120; % 1-150 is 150 ms interval. 21:120 is 100 ms interval
 maxlag = 15; % max lag is 15 ms
-% smoothwin = 10; % 10 ms smoothing window
 nECoG_ch = size(env_true,2);
 
 % use the true envelop to compute the magnitude matrix
@@ -14,8 +13,6 @@ elseif strcmp(mag_type, 'ch_minmax')
     temp_true = temp_true ./ max(temp_true,[],2); % normalize to the max channel
 elseif strcmp(mag_type, 'event_mean')
     temp_true = temp_true./ mean(temp_true); % normalize to the mean over trials
-%     temp_true = (temp_true-min(temp_true,[],1)) ./ (max(temp_true,[],1)-min(temp_true,[],1)); % normalize to the max trial
-%     temp_true = (temp_true - mean(temp_true)) ./ std(temp_true); % z-score over the trials
 else
     error('mag_type needs to be specified (raw, ch_minmax, event_minmax)'); 
 end
