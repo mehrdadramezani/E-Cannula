@@ -4,8 +4,6 @@ figure('pos',[10+20,10,cnum*100,200]);
 for k = 1:cnum
     subaxis(2,cnum,k,'SpacingVert',0.03,'MR',0.01,'SpacingHoriz',0.01,'ML',0.01,'MT',0.07,'MB',0.01);
     data = squeeze(temp_mags(k,:,:)); 
-%     mag_range = [0,700];
-%     mag_range = [0,2];
     mag_range = [0,0.8];
     % interpolate the data
     [X,Y] = meshgrid(1:4,1:4);
@@ -26,13 +24,6 @@ for k = 1:cnum
         plot(t_plot(interval)+xoffsets(c),-data_remap(c,interval)/100+yoffsets(c),'k'); hold on;
         plot(xoffsets(c)+[0,0], [-0.4,0.3]+yoffsets(c), '--k');
     end
-%     hold on;
-%     data_seg = squeeze(temp_recon(k,:,:));
-%     data_remap = nan(16,nstep);
-%     data_remap(pos(good_ch),:) = data_seg;
-%     for c = 1:size(data_remap,1)
-%         plot(t_plot(interval)+xoffsets(c),-data_remap(c,interval)+yoffsets(c),'r'); hold on;
-%     end
     xlim([0.7,4.3]); ylim([0.7,4.3]);
     set(gca,'XColor','None','YColor','None'); box off;
     
